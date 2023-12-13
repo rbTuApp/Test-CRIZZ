@@ -4,6 +4,8 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+import { ApolloClient, InMemoryCache, ApolloProvider, gql, createHttpLink } from '@apollo/client';
+import { MoviesProvider } from '../utils/context';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -42,15 +44,29 @@ export default function RootLayout() {
   return <RootLayoutNav />;
 }
 
+const link = createHttpLink({
+  uri: 'https://api.themoviedb.org/graphql',
+  credentials: 'same-origin'
+});
+
+const client = new ApolloClient({
+  link,
+  cache: new InMemoryCache(),
+});
+
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <ApolloProvider client={client}>
+      <MoviesProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          </Stack>
+        </ThemeProvider>
+      </MoviesProvider>
+    </ApolloProvider>
   );
 }

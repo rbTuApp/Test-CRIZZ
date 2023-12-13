@@ -9,7 +9,6 @@ const MoviesContext = createContext({
     deleteFavorites: (favorite: any) => { },
 });
 function authReducer(state: any, action: any) {
-    console.log(state, action);
     switch (action.type) {
         case "SET_FAVORITES":
             return {
